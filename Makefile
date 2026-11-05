@@ -16,12 +16,11 @@ help:
 	@echo "  make run    Placeholder execution target for the bare-metal firmware."
 	@echo "  make debug  Placeholder debugging target for QEMU/GDB workflows."
 	@echo ""
-	@echo "Current status: infrastructure-only foundation; firmware sources are not"
-	@echo "yet implemented in this Phase 0 step."
+	@echo "Current status: minimal startup and linker infrastructure only."
 
 run:
-	@echo "[INFO] Phase 0 foundation only: no firmware has been added yet."
-	@echo "[INFO] The first implementation step is repository scaffolding and setup."
+	@echo "[INFO] Startup and linker scaffold is in place; UART and PCIe code"
+	@echo "[INFO] will be added in later, smaller steps."
 
 debug: run
 
