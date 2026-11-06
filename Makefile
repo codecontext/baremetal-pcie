@@ -11,8 +11,9 @@ BIN := $(BUILD_DIR)/baremetal-pcie.bin
 CFLAGS := -O2 -g -ffreestanding -fno-builtin -Wall -Wextra -Werror -nostdlib
 
 ASM_SRCS := boot/startup.S
-C_SRCS := main.c drivers/uart/uart.c
-OBJS := $(BUILD_DIR)/boot/startup.o $(BUILD_DIR)/main.o $(BUILD_DIR)/drivers/uart/uart.o
+C_SRCS := main.c drivers/uart/uart.c platform/qemu-virt/fdt.c
+OBJS := $(BUILD_DIR)/boot/startup.o $(BUILD_DIR)/main.o \
+	$(BUILD_DIR)/drivers/uart/uart.o $(BUILD_DIR)/platform/qemu-virt/fdt.o
 
 .PHONY: help clean rebuild run debug
 
@@ -32,11 +33,15 @@ $(BUILD_DIR):
 	@mkdir -p $(BUILD_DIR)
 	@mkdir -p $(BUILD_DIR)/boot
 	@mkdir -p $(BUILD_DIR)/drivers/uart
+	@mkdir -p $(BUILD_DIR)/platform/qemu-virt
 
-$(BUILD_DIR)/main.o: main.c drivers/uart/uart.h | $(BUILD_DIR)
+$(BUILD_DIR)/main.o: main.c drivers/uart/uart.h platform/qemu-virt/fdt.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/drivers/uart/uart.o: drivers/uart/uart.c drivers/uart/uart.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/platform/qemu-virt/fdt.o: platform/qemu-virt/fdt.c platform/qemu-virt/fdt.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/boot/startup.o: boot/startup.S | $(BUILD_DIR)

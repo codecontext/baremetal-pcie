@@ -15,8 +15,9 @@ network stack or DMA-based data path.
 ## Current status
 
 The project currently builds minimal AArch64 firmware for QEMU virt. Startup
-initializes the stack and clears BSS, then `main()` initializes the PL011 UART
-and prints a boot message. PCIe support remains future work.
+initializes the stack, clears BSS, and passes QEMU's DTB pointer to `main()`.
+The firmware initializes the PL011 UART and validates the FDT magic and minimum
+header size. DTB property parsing and PCIe support remain future work.
 
 ## Repository structure
 
@@ -40,6 +41,8 @@ baremetal-pcie/
 │   └── printf/
 ├── platform/
 │   └── qemu-virt/
+│       ├── fdt.c
+│       └── fdt.h
 ├── tests/
 │   └── pci/
 ├── scripts/
@@ -59,7 +62,8 @@ baremetal-pcie/
 - `drivers/`: Hardware-specific drivers, with each driver's public header beside
   its implementation (for example, `drivers/uart/uart.c` and `uart.h`).
 - `lib/`: Generic utility code such as memory helpers and minimal formatting.
-- `platform/`: QEMU virt platform discovery and DTB/ACPI style resource mapping.
+- `platform/`: QEMU virt platform discovery; currently contains basic FDT header
+  validation, with resource parsing still pending.
 - `tests/`: Validation and functional checks for each milestone.
 - `scripts/`: Local automation for build, run, and debug workflows.
 - `docs/`: Architecture notes, setup guides, and PCIe reference material.

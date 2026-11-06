@@ -9,6 +9,9 @@
 .type _start, %function
 
 _start:
+    /* Preserve QEMU's DTB address passed in x0 across BSS initialization. */
+    mov x19, x0
+
     /* Set the stack pointer to the highest valid RAM address. */
     ldr x30, =__stack_top
     mov sp, x30
@@ -29,7 +32,8 @@ _start:
     b 1b
 
 2:
-    /* Transfer control to the C runtime entry point. */
+    /* Pass the preserved DTB address to the C entry point in x0. */
+    mov x0, x19
     bl main
 
 3:
