@@ -8,7 +8,7 @@ ENTRY(_start)
 MEMORY
 {
     /* QEMU virt maps RAM to a flat region that is large enough for the firmware. */
-    RAM (rwx) : ORIGIN = 0x40000000, LENGTH = 0x20000000
+    RAM (rwx) : ORIGIN = 0x40000000, LENGTH = 0x08000000
 }
 
 SECTIONS

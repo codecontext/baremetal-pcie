@@ -12,19 +12,13 @@ an emulated PCIe root port. The project deliberately starts with the host-side
 firmware and PCIe discovery flow. It does not begin with a complete virtio
 network stack or DMA-based data path.
 
-## Current Phase 0 status
+## Current status
 
-This repository has been initialized with the minimal project foundation only:
+The project currently builds minimal AArch64 firmware for QEMU virt. Startup
+initializes the stack and clears BSS, then `main()` initializes the PL011 UART
+and prints a boot message. PCIe support remains future work.
 
-- repository layout and directory structure
-- project documentation
-- build entry points and clean targets
-- development environment notes
-
-The actual bare-metal boot firmware and PCIe driver code will be added in later
-phases after review and approval.
-
-## Final repository structure
+## Repository structure
 
 ```text
 baremetal-pcie/
@@ -35,6 +29,8 @@ baremetal-pcie/
 │       └── gic/
 ├── drivers/
 │   ├── uart/
+│   │   ├── uart.c
+│   │   └── uart.h
 │   ├── pci/
 │   └── virtio/
 │       └── pci/
