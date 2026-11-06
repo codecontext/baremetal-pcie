@@ -38,11 +38,6 @@ baremetal-pcie/
 │   ├── pci/
 │   └── virtio/
 │       └── pci/
-├── include/
-│   ├── common/
-│   ├── arch/
-│   ├── drivers/
-│   └── pci/
 ├── lib/
 │   ├── string/
 │   ├── memory/
@@ -65,8 +60,8 @@ baremetal-pcie/
 - `boot/`: AArch64 startup assembly, vector tables, linker script, and early boot
   setup.
 - `arch/`: Architecture-specific CPU and exception helpers.
-- `drivers/`: Hardware-specific device drivers such as UART, PCI, and virtio.
-- `include/`: Public header files and common interface declarations.
+- `drivers/`: Hardware-specific drivers, with each driver's public header beside
+  its implementation (for example, `drivers/uart/uart.c` and `uart.h`).
 - `lib/`: Generic utility code such as memory helpers and minimal formatting.
 - `platform/`: QEMU virt platform discovery and DTB/ACPI style resource mapping.
 - `tests/`: Validation and functional checks for each milestone.
