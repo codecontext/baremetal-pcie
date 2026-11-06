@@ -79,13 +79,19 @@ This project is designed for the host environment described in the project brief
 
 ```bash
 cd /home/dask/work/baremetal-pcie
-make help
-make clean
 ```
 
-This is intentionally a minimal build scaffold for the repository foundation.
-Actual firmware compilation will be added once the bare-metal boot and PCIe code
-is ready for implementation.
+Available commands:
+
+- `make`: Incrementally build the firmware, rebuilding only missing or outdated outputs.
+- `make help`: List the available Make targets.
+- `make clean`: Remove generated files from `build/`.
+- `make rebuild`: Clean generated files, then rebuild the firmware from scratch.
+- `make run`: Run the firmware in QEMU virt and connect its UART to the terminal.
+- `make debug`: Start QEMU paused with a GDB server on port 1234.
+
+The build produces `build/baremetal-pcie.elf` for symbols and debugging and
+`build/baremetal-pcie.bin`, the raw image loaded by QEMU.
 
 ## Documentation
 
@@ -111,6 +117,6 @@ The project roadmap follows the phases described in the project brief:
 
 ## Notes
 
-This repository is intentionally kept minimal at this stage. It avoids creating
-future source placeholders without a clear implementation path. The next step,
-after review, is to add the AArch64 startup and boot infrastructure.
+The current milestone is limited to startup, linker layout, and UART console
+output. PCIe functionality will be added in small, independently validated
+steps.
