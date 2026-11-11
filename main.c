@@ -14,6 +14,8 @@ int main(const void *device_tree_blob)
 {
     uint64_t memory_base = 0U;
     uint64_t memory_size = 0U;
+    uint64_t pci_ecam_base = 0U;
+    uint64_t pci_ecam_size = 0U;
 
     uart_init();
     uart_puts("Boot complete. Welcome!\n");
@@ -32,6 +34,16 @@ int main(const void *device_tree_blob)
         uart_puts("\n");
     } else {
         uart_puts("FDT memory: unavailable\n");
+    }
+
+    if (fdt_get_pci_ecam_range(device_tree_blob, &pci_ecam_base, &pci_ecam_size)) {
+        uart_puts("FDT PCIe ECAM: base=");
+        uart_puthex64(pci_ecam_base);
+        uart_puts(", size=");
+        uart_puthex64(pci_ecam_size);
+        uart_puts("\n");
+    } else {
+        uart_puts("FDT PCIe ECAM: unavailable\n");
     }
 
     for (;;) {

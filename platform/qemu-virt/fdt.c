@@ -79,6 +79,31 @@ static bool fdt_name_is_memory(const char *name)
 }
 
 /**
+ * @brief Match a device-tree node name against a leading PCI-related prefix.
+ *
+ * @param name Node name to test.
+ * @return true when the node appears to represent a PCI or PCIe host bridge.
+ */
+static bool fdt_name_is_pci(const char *name)
+{
+    if (name == 0) {
+        return false;
+    }
+
+    if (name[0] == 'p' && name[1] == 'c' && name[2] == 'i' &&
+        (name[3] == '\0' || name[3] == '@')) {
+        return true;
+    }
+
+    if (name[0] == 'p' && name[1] == 'c' && name[2] == 'i' && name[3] == 'e' &&
+        (name[4] == '\0' || name[4] == '@')) {
+        return true;
+    }
+
+    return false;
+}
+
+/**
  * @brief Check the FDT magic and minimum header size.
  *
  * @param blob Address of the FDT blob provided at firmware entry.
@@ -183,6 +208,95 @@ bool fdt_get_memory_range(const void *blob, uint64_t *base, uint64_t *size)
 
         case FDT_END_NODE:
             inside_memory_node = false;
+            break;
+
+        case FDT_END:
+            return false;
+
+        default:
+            break;
+        }
+    }
+
+    return false;
+}
+
+/**
+ * @brief Read the ECAM address range from the generic PCI host bridge node.
+ *
+ * @details QEMU virt exposes the PCI host bridge as a pcie@... node whose reg
+ * property contains the ECAM base and the address window size. The node is a
+ * single 32-bit cell header followed by the low 32-bit base and size values.
+ *
+ * @param blob Pointer to the flattened device tree blob.
+ * @param base Output base address of the PCIe ECAM window.
+ * @param size Output size of the ECAM window in bytes.
+ * @return true when the generic PCI host bridge is found and the ECAM range is parsed.
+ */
+bool fdt_get_pci_ecam_range(const void *blob, uint64_t *base, uint64_t *size)
+{
+    const uint8_t *bytes = blob;
+    const uint8_t *cursor;
+    const uint8_t *strings;
+    const uint8_t *end;
+    uint32_t total_size;
+    uint32_t off_dt_struct;
+    uint32_t off_dt_strings;
+    bool inside_pci_node = false;
+
+    if (bytes == 0 || base == 0 || size == 0) {
+        return false;
+    }
+
+    if (!fdt_header_is_valid(blob)) {
+        return false;
+    }
+
+    total_size = fdt_read_be32(bytes + 4U);
+    off_dt_struct = fdt_read_be32(bytes + 8U);
+    off_dt_strings = fdt_read_be32(bytes + 12U);
+    strings = bytes + off_dt_strings;
+    end = bytes + total_size;
+    cursor = bytes + off_dt_struct;
+
+    while (cursor < end) {
+        uint32_t token = fdt_read_be32(cursor);
+        cursor += 4U;
+
+        switch (token) {
+        case FDT_BEGIN_NODE: {
+            const char *name = (const char *)cursor;
+            uint32_t name_length = 0U;
+
+            while (cursor[name_length] != '\0') {
+                name_length++;
+            }
+
+            inside_pci_node = fdt_name_is_pci(name);
+            cursor += fdt_align4(name_length + 1U);
+            break;
+        }
+
+        case FDT_PROP: {
+            uint32_t length = fdt_read_be32(cursor);
+            uint32_t name_offset = fdt_read_be32(cursor + 4U);
+            const char *property_name = (const char *)(strings + name_offset);
+            const uint8_t *property_data = cursor + 8U;
+
+            if (inside_pci_node && property_name[0] == 'r' &&
+                property_name[1] == 'e' && property_name[2] == 'g' &&
+                property_name[3] == '\0' && length >= 16U) {
+                *base = (uint64_t)fdt_read_be32(property_data + 4U);
+                *size = (uint64_t)fdt_read_be32(property_data + 12U);
+                return true;
+            }
+
+            cursor += fdt_align4(8U + length);
+            break;
+        }
+
+        case FDT_END_NODE:
+            inside_pci_node = false;
             break;
 
         case FDT_END:

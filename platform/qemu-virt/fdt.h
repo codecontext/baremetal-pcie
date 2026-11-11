@@ -11,5 +11,6 @@
 
 bool fdt_header_is_valid(const void *blob);
 bool fdt_get_memory_range(const void *blob, uint64_t *base, uint64_t *size);
+bool fdt_get_pci_ecam_range(const void *blob, uint64_t *base, uint64_t *size);
 
 #endif /* QEMU_VIRT_FDT_H */
