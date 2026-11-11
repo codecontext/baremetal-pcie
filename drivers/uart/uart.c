@@ -88,3 +88,20 @@ void uart_puts(const char *str)
         uart_putc(*str++);
     }
 }
+
+/**
+ * @brief Print a 64-bit value in hexadecimal form.
+ *
+ * @param value Number to render with a 0x prefix.
+ */
+void uart_puthex64(uint64_t value)
+{
+    static const char digits[] = "0123456789abcdef";
+    int shift;
+
+    uart_puts("0x");
+
+    for (shift = 60; shift >= 0; shift -= 4) {
+        uart_putc(digits[(value >> shift) & 0xFU]);
+    }
+}
