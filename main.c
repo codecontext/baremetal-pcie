@@ -1,5 +1,6 @@
 #include "drivers/uart/uart.h"
 #include "platform/qemu-virt/fdt.h"
+#include "platform/qemu-virt/pci.h"
 
 /**
  * @brief Minimal C entry point for the bare-metal firmware.
@@ -42,6 +43,13 @@ int main(const void *device_tree_blob)
         uart_puts(", size=");
         uart_puthex64(pci_ecam_size);
         uart_puts("\n");
+
+        bool scan_ok = pci_scan_root_bus(pci_ecam_base);
+        if (scan_ok) {
+            uart_puts("PCI scan: completed\n");
+        } else {
+            uart_puts("PCI scan: failed\n");
+        }
     } else {
         uart_puts("FDT PCIe ECAM: unavailable\n");
     }

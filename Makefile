@@ -8,12 +8,13 @@ ELF := $(BUILD_DIR)/baremetal-pcie.elf
 BIN := $(BUILD_DIR)/baremetal-pcie.bin
 .DEFAULT_GOAL := $(BIN)
 
-CFLAGS := -O2 -g -ffreestanding -fno-builtin -Wall -Wextra -Werror -nostdlib
+CFLAGS := -O2 -g -ffreestanding -fno-builtin -Wall -Wextra -Werror -nostdlib -I.
 
 ASM_SRCS := boot/startup.S
-C_SRCS := main.c drivers/uart/uart.c platform/qemu-virt/fdt.c
+C_SRCS := main.c drivers/uart/uart.c platform/qemu-virt/fdt.c platform/qemu-virt/pci.c
 OBJS := $(BUILD_DIR)/boot/startup.o $(BUILD_DIR)/main.o \
-	$(BUILD_DIR)/drivers/uart/uart.o $(BUILD_DIR)/platform/qemu-virt/fdt.o
+	$(BUILD_DIR)/drivers/uart/uart.o $(BUILD_DIR)/platform/qemu-virt/fdt.o \
+	$(BUILD_DIR)/platform/qemu-virt/pci.o
 
 .PHONY: help clean rebuild run debug
 
@@ -42,6 +43,9 @@ $(BUILD_DIR)/drivers/uart/uart.o: drivers/uart/uart.c drivers/uart/uart.h | $(BU
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/platform/qemu-virt/fdt.o: platform/qemu-virt/fdt.c platform/qemu-virt/fdt.h | $(BUILD_DIR)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(BUILD_DIR)/platform/qemu-virt/pci.o: platform/qemu-virt/pci.c platform/qemu-virt/pci.h drivers/uart/uart.h | $(BUILD_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
 $(BUILD_DIR)/boot/startup.o: boot/startup.S | $(BUILD_DIR)
