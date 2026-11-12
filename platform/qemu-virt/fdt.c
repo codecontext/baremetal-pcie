@@ -225,8 +225,8 @@ bool fdt_get_memory_range(const void *blob, uint64_t *base, uint64_t *size)
  * @brief Read the ECAM address range from the generic PCI host bridge node.
  *
  * @details QEMU virt exposes the PCI host bridge as a pcie@... node whose reg
- * property contains the ECAM base and the address window size. The node is a
- * single 32-bit cell header followed by the low 32-bit base and size values.
+ * property contains the ECAM base and window size as two 64-bit big-endian
+ * values.
  *
  * @param blob Pointer to the flattened device tree blob.
  * @param base Output base address of the PCIe ECAM window.
@@ -286,8 +286,8 @@ bool fdt_get_pci_ecam_range(const void *blob, uint64_t *base, uint64_t *size)
             if (inside_pci_node && property_name[0] == 'r' &&
                 property_name[1] == 'e' && property_name[2] == 'g' &&
                 property_name[3] == '\0' && length >= 16U) {
-                *base = (uint64_t)fdt_read_be32(property_data + 4U);
-                *size = (uint64_t)fdt_read_be32(property_data + 12U);
+                *base = fdt_read_be64(property_data);
+                *size = fdt_read_be64(property_data + 8U);
                 return true;
             }
 
