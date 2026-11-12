@@ -10,6 +10,7 @@
 
 void uart_init(void);
 void uart_puts(const char *str);
+void uart_puthex32(uint32_t value);
 void uart_puthex64(uint64_t value);
 
 #endif /* UART_H */

@@ -90,6 +90,23 @@ void uart_puts(const char *str)
 }
 
 /**
+ * @brief Print a 32-bit value in hexadecimal form.
+ *
+ * @param value Number to render with a 0x prefix.
+ */
+void uart_puthex32(uint32_t value)
+{
+    static const char digits[] = "0123456789abcdef";
+    int shift;
+
+    uart_puts("0x");
+
+    for (shift = 28; shift >= 0; shift -= 4) {
+        uart_putc(digits[(value >> shift) & 0xFU]);
+    }
+}
+
+/**
  * @brief Print a 64-bit value in hexadecimal form.
  *
  * @param value Number to render with a 0x prefix.
