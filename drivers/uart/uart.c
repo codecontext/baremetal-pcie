@@ -90,13 +90,33 @@ void uart_puts(const char *str)
 }
 
 /**
+ * @brief Print a 32-bit unsigned integer in decimal form.
+ *
+ * @param value Number to render in base 10.
+ */
+void uart_putuint32(uint32_t value)
+{
+    char digits[10];
+    uint32_t count = 0U;
+
+    do {
+        digits[count++] = (char)('0' + (value % 10U));
+        value /= 10U;
+    } while (value != 0U);
+
+    while (count != 0U) {
+        uart_putc(digits[--count]);
+    }
+}
+
+/**
  * @brief Print a 32-bit value in hexadecimal form.
  *
  * @param value Number to render with a 0x prefix.
  */
 void uart_puthex32(uint32_t value)
 {
-    static const char digits[] = "0123456789abcdef";
+    static const char digits[] = "0123456789ABCDEF";
     int shift;
 
     uart_puts("0x");
@@ -113,7 +133,7 @@ void uart_puthex32(uint32_t value)
  */
 void uart_puthex64(uint64_t value)
 {
-    static const char digits[] = "0123456789abcdef";
+    static const char digits[] = "0123456789ABCDEF";
     int shift;
 
     uart_puts("0x");
