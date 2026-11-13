@@ -3,23 +3,31 @@
 #include "platform/qemu-virt/pci.h"
 
 /**
+ * @brief DTB address supplied by the boot environment.
+ *
+ * @details Startup stores the pointer passed in x0 here after clearing BSS and
+ * before calling main().
+ */
+const void * volatile boot_device_tree_blob;
+
+/**
  * @brief Minimal C entry point for the bare-metal firmware.
  *
- * @details Validates the QEMU-provided FDT header and reads the memory node so
- * the firmware confirms the platform memory map before later PCIe work.
+ * @details Reads the DTB pointer saved by startup, validates the FDT header,
+ * and uses the platform data for PCIe discovery.
  *
- * @param device_tree_blob Address of the QEMU-provided flattened device tree.
  * @return This function does not return under normal operation.
  */
-int main(const void *device_tree_blob)
+int main(void)
 {
+    const void *device_tree_blob = boot_device_tree_blob;
     uint64_t memory_base = 0U;
     uint64_t memory_size = 0U;
     uint64_t pci_ecam_base = 0U;
     uint64_t pci_ecam_size = 0U;
 
     uart_init();
-    uart_puts("Boot complete. Welcome!\n");
+    uart_puts("\nSystem startup complete. Welcome!\n");
 
     if (fdt_header_is_valid(device_tree_blob)) {
         uart_puts("FDT header: valid\n");

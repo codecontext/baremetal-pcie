@@ -7,6 +7,7 @@
 
 .global _start
 .type _start, %function
+.extern boot_device_tree_blob
 
 _start:
     /* Preserve QEMU's DTB address passed in x0 across BSS initialization. */
@@ -32,8 +33,16 @@ _start:
     b 1b
 
 2:
-    /* Pass the preserved DTB address to the C entry point in x0. */
-    mov x0, x19
+    /* Load the 4 KiB page containing the C global into x0. */
+    adrp x0, boot_device_tree_blob
+
+    /* Add the global's offset within that page to form its address. */
+    add x0, x0, :lo12:boot_device_tree_blob
+    
+    /* Store QEMU's DTB pointer, preserved in x19, into the global. */
+    str x19, [x0]
+    
+    /* Call main(); it reads the DTB pointer from the global. */
     bl main
 
 3:
