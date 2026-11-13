@@ -214,9 +214,10 @@ bool pci_scan_root_bus(uint64_t ecam_base)
         return false;
     }
 
-    uart_puts("PCI scan buses 0-1\n");
-
     for (bus = 0U; bus < PCI_MAX_BUS; bus++) {
+        uart_puts("\nScanning bus ");
+        uart_putuint32(bus);
+        uart_puts("\n");
         for (device = 0U; device < PCI_MAX_DEVICE; device++) {
             if (!pci_ecam_config_read32(ecam_base, bus, device, function,
                                         PCI_VENDOR_ID_OFFSET, &id_reg)) {
@@ -232,11 +233,11 @@ bool pci_scan_root_bus(uint64_t ecam_base)
             }
 
             uart_puts("Found bus=");
-            uart_puthex32(bus);
+            uart_putuint32(bus);
             uart_puts(" dev=");
-            uart_puthex32(device);
+            uart_putuint32(device);
             uart_puts(" func=");
-            uart_puthex32(function);
+            uart_putuint32(function);
             uart_puts(" vend=");
             uart_puthex32(vendor_id);
             uart_puts(" dev_id=");
